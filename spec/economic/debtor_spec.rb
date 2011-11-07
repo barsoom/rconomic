@@ -35,6 +35,21 @@ describe Economic::Debtor do
     end
   end
 
+  describe ".invoices" do
+    it "returns an InvoiceProxy" do
+      subject.invoices.should be_instance_of(Economic::InvoiceProxy)
+    end
+
+    it "memoizes the proxy" do
+      subject.invoices.should === subject.invoices
+    end
+
+    it "should store the session" do
+      subject.session.should_not be_nil
+      subject.invoices.session.should == subject.session
+    end
+  end
+
   describe ".current_invoices" do
     it "returns an CurrentInvoiceProxy" do
       subject.current_invoices.should be_instance_of(Economic::CurrentInvoiceProxy)

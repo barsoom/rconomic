@@ -1,14 +1,15 @@
 PATH
   remote: .
   specs:
-    rconomic (0.2.1)
+    rconomic (0.3.0)
       activesupport (~> 3.0)
       savon (= 0.9.5)
 
 GEM
   remote: http://rubygems.org/
   specs:
-    activesupport (3.0.9)
+    activesupport (3.1.1)
+      multi_json (~> 1.0)
     akami (1.0.0)
       gyoku (>= 0.4.0)
     builder (3.0.0)
@@ -22,6 +23,7 @@ GEM
     httpi (0.9.5)
       rack
     mocha (0.9.12)
+    multi_json (1.0.3)
     nokogiri (1.5.0)
     nori (1.0.2)
     rack (1.3.0)
