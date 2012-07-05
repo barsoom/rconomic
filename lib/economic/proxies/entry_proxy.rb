@@ -10,7 +10,7 @@ module Economic
         }
       end
 
-      build_array(response)
+      build_serial_number_array(response)
     end
 
     # Undocumented tip: if you only care about the min_number, pass in the maximum
@@ -26,7 +26,30 @@ module Economic
         }
       end
 
-      build_array(response)
+      serial_numbers = build_serial_number_array(response)
+      handles = serial_numbers.map { |number|
+        {
+          "EntryHandle" => {
+            "SerialNumber" => number
+          }
+        }
+      }
+
+      unless handles.empty?
+        entity_data = session.request(entity_class.soap_action(:get_data_array)) do
+          soap.body = {'entityHandles' => handles }
+        end
+
+        entry_data = ensure_array(entity_data[:entry_data])
+
+        # Build Entity objects and add them to the proxy
+        entry_data.each do |data|
+          entity = build(data)
+          entity.persisted = true
+        end
+      end
+
+      self
     end
 
     def get_last_used_serial_number
@@ -48,12 +71,17 @@ module Economic
 
     private
 
-    def build_array(response)
-      # The response[:entry_handle] format may be any of
+      # Some values may be e.g. any of
       #   [{:serial_number=>"1"}, {:serial_number=>"2"}]  # Many results.
       #   {:serial_number=>"1"}                           # One result.
       #   nil                                             # No results.
-      entry_handles = [ response[:entry_handle] ].flatten.compact
+      # This method consistently turns them into an array.
+    def ensure_array(value)
+      [value].flatten.compact
+    end
+
+    def build_serial_number_array(response)
+      entry_handles = ensure_array(response[:entry_handle])
 
       entry_handles.map do |entry_handle|
         entry_handle[:serial_number].to_i

@@ -36,17 +36,24 @@ describe Economic::EntryProxy do
       savon.expects("Entry_FindBySerialNumberInterval").
         with('minNumber' => 123, 'maxNumber' => 456).
         returns(:many)
-      subject.find_by_serial_number_interval(123, 456).should == [1, 2]
+      savon.expects('Entry_GetDataArray').
+        returns(:multiple)
+      actual = subject.find_by_serial_number_interval(123, 456)
+      actual.size.should == 2
+      actual.first.should be_instance_of(Economic::Entry)
     end
 
     it 'should handle a single serial number in the response' do
       savon.stubs("Entry_FindBySerialNumberInterval").returns(:single)
-      subject.find_by_serial_number_interval(123, 456).should == [1]
+      savon.stubs('Entry_GetDataArray').returns(:single)
+      actual = subject.find_by_serial_number_interval(123, 456)
+      actual.size.should == 1
     end
 
     it 'should handle an empty response' do
       savon.stubs("Entry_FindBySerialNumberInterval").returns(:none)
-      subject.find_by_serial_number_interval(123, 456).should == []
+      actual = subject.find_by_serial_number_interval(123, 456)
+      actual.size.should == 0
     end
   end
 
