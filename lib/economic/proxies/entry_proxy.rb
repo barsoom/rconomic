@@ -28,16 +28,12 @@ module Economic
 
       serial_numbers = build_serial_number_array(response)
       handles = serial_numbers.map { |number|
-        {
-          "EntryHandle" => {
-            "SerialNumber" => number
-          }
-        }
+        { "SerialNumber" => number }
       }
 
       unless handles.empty?
-        entity_data = session.request(entity_class.soap_action(:get_data_array)) do
-          soap.body = {'entityHandles' => handles }
+        entity_data = session.request(entity_class.soap_action('GetDataArray')) do
+          soap.body = {'entityHandles' => { "EntryHandle" => handles } }
         end
 
         entry_data = ensure_array(entity_data[:entry_data])
